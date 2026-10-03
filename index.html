@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wayfarer — ревью озвучки</title>
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=PT+Sans:wght@400;700&family=PT+Mono&display=swap">
+<style>
+  /* Ночь над Азеротом: тёмное небо, золото рамок, фиолетовый камень — как окно плеера и дневник Wayfarer.
+     Одна карточка реплики по центру, сводка сверху, свои отметки и лидеры сбоку (на телефоне — ниже). */
+  :root {
+    color-scheme: dark;
+    --sky: #0d0f1c; --sky-2: #151a2e; --panel: #1a1f35; --panel-2: #222844; --line: #2f3658;
+    --text: #ece5d3; --muted: #a7a3b8; --faint: #6f6c84;
+    --gold: #e6bf63; --gold-2: #f3d995; --gem: #a27cff; --ok: #7fd18b; --bad: #ff8a7a;
+    --display: "Cormorant Garamond", Georgia, serif;
+    --body: "PT Sans", "Segoe UI", system-ui, sans-serif;
+    --mono: "PT Mono", ui-monospace, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: radial-gradient(1200px 600px at 20% -10%, #2a2050 0%, transparent 60%),
+                radial-gradient(900px 500px at 110% 10%, #12304a 0%, transparent 55%), var(--sky);
+    color: var(--text); font: 16px/1.5 var(--body); padding: 0 16px 48px;
+  }
+  a { color: var(--gold-2); }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--gem); outline-offset: 2px;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; padding: 18px 0 14px;
+    border-bottom: 1px solid var(--line); margin-bottom: 22px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+  .brand img { width: 40px; height: 40px; border-radius: 8px; }
+  .brand h1 { font: 700 26px/1 var(--display); margin: 0; color: var(--gold-2); letter-spacing: .3px; }
+  .brand small { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+  .progress { min-width: 240px; flex: 1 1 280px; max-width: 420px; }
+  .progress .bar { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+  .progress .fill { height: 100%; width: 0; background: linear-gradient(90deg, #b88a2c, var(--gold-2)); transition: width .6s ease; }
+  .progress .nums { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-top: 5px;
+                    font-variant-numeric: tabular-nums; }
+  .who { font-size: 14px; color: var(--muted); text-align: right; }
+  .who b { color: var(--text); }
+  .linkbtn { background: none; border: 0; padding: 0; color: var(--gold-2); text-decoration: underline; text-underline-offset: 3px; }
+
+  main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 22px; align-items: start; }
+  @media (max-width: 880px) { main { grid-template-columns: minmax(0, 1fr); } }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel), #161a2d); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px 24px 20px; box-shadow: 0 10px 40px rgba(0,0,0,.35); min-width: 0;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .chip { font-size: 12px; letter-spacing: .6px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px;
+          border: 1px solid var(--line); color: var(--muted); background: rgba(255,255,255,.02); }
+  .chip.kind { color: var(--gold-2); border-color: #5c4b22; background: rgba(230,191,99,.08); }
+  .chip.alliance { color: #8fb6ff; border-color: #2c4a80; }
+  .chip.horde { color: #ff9a8a; border-color: #803030; }
+  .title { font: 700 30px/1.15 var(--display); margin: 2px 0 4px; text-wrap: balance; color: var(--text); }
+  .speaker { color: var(--muted); margin-bottom: 16px; }
+  .speaker b { color: var(--gold-2); font-weight: 700; }
+
+  .player { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;
+            background: rgba(0,0,0,.25); border: 1px solid var(--line); margin-bottom: 16px; }
+  .play { width: 48px; height: 48px; border-radius: 50%; border: 1px solid #6b5626; flex: none;
+          background: radial-gradient(circle at 35% 30%, #f6dc98, #c99a3b 60%, #8b6519); color: #2a1d07;
+          display: grid; place-items: center; font-size: 18px; box-shadow: 0 2px 10px rgba(230,191,99,.25); }
+  .play svg { width: 18px; height: 18px; }
+  .track { flex: 1; min-width: 0; }
+  .seek { height: 6px; background: var(--panel-2); border-radius: 3px; position: relative; cursor: pointer; }
+  .seek .done { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--gold); border-radius: 3px; }
+  .times { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 6px;
+           font-variant-numeric: tabular-nums; }
+  .speed, .again { background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px;
+                   font-size: 13px; color: var(--muted); flex: none; }
+  .speed:hover, .again:hover { color: var(--text); }
+
+  .text { white-space: pre-wrap; font-size: 17px; line-height: 1.65; max-width: 68ch; color: #f1ead9; margin: 0 0 14px; }
+  .uid { font: 12px var(--mono); color: var(--faint); margin-bottom: 18px; }
+  .uid button { background: none; border: 0; color: var(--faint); text-decoration: underline; padding: 0 0 0 8px; font-size: 12px; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { border-radius: 10px; padding: 11px 18px; border: 1px solid var(--line); background: var(--panel-2); font-weight: 700; }
+  .btn kbd { font: 11px var(--mono); opacity: .7; margin-left: 8px; border: 1px solid currentColor; border-radius: 4px; padding: 0 4px; }
+  .btn.ok { background: linear-gradient(180deg, #2f6a3c, #245330); border-color: #3e8a4f; color: #e4ffe8; }
+  .btn.bad { background: linear-gradient(180deg, #6e2d2a, #552220); border-color: #94403a; color: #ffe9e6; }
+  .btn.skip { color: var(--muted); }
+  .btn:disabled { opacity: .5; cursor: progress; }
+
+  .issue { margin-top: 16px; padding: 16px; border-radius: 12px; border: 1px solid #94403a; background: rgba(110,45,42,.18); }
+  .issue[hidden] { display: none; }
+  .cats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .cat { border: 1px solid var(--line); background: var(--panel-2); border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+  .cat[aria-pressed="true"] { border-color: var(--bad); color: #fff; background: rgba(255,138,122,.18); }
+  .cat kbd { font: 11px var(--mono); opacity: .6; margin-right: 6px; }
+  textarea, input, select {
+    width: 100%; background: #10132a; color: var(--text); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; font: 15px var(--body);
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  .issue .row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+
+  aside { display: grid; gap: 16px; min-width: 0; }
+  .box { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .box h2 { font: 700 19px/1.2 var(--display); margin: 0 0 10px; color: var(--gold-2); }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 14px; }
+  .list li { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+  .list .n { font-variant-numeric: tabular-nums; color: var(--muted); }
+  .list .me { color: var(--gold-2); }
+  .mark { font-size: 12px; padding: 1px 7px; border-radius: 999px; }
+  .mark.ok { color: var(--ok); border: 1px solid #3e8a4f; }
+  .mark.issue { color: var(--bad); border: 1px solid #94403a; }
+  .muted { color: var(--muted); font-size: 14px; }
+  .filters { display: grid; gap: 8px; }
+  .filters label { font-size: 13px; color: var(--muted); }
+
+  .setup { max-width: 520px; margin: 40px auto; }
+  .setup h2 { font: 700 30px/1.15 var(--display); margin: 0 0 8px; color: var(--gold-2); }
+  .setup p { color: var(--muted); }
+  .setup form { display: grid; gap: 12px; margin-top: 18px; }
+  .setup label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+  .error { color: var(--bad); min-height: 1.5em; }
+  .toast { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); background: var(--panel-2);
+           border: 1px solid var(--line); padding: 10px 16px; border-radius: 10px; box-shadow: 0 6px 24px rgba(0,0,0,.4);
+           max-width: calc(100% - 32px); }
+  details.help summary { cursor: pointer; color: var(--gold-2); }
+  details.help ul { padding-left: 18px; margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+  @media (prefers-reduced-motion: reduce) { .progress .fill { transition: none; } }
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <img src="icon.png" alt="">
+      <div><h1>Wayfarer</h1><small>Ревью русской озвучки WoW Forever</small></div>
+    </div>
+    <div class="progress" aria-label="Общий прогресс">
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="nums"><span id="done-n">Проверено: —</span><span id="left-n"></span></div>
+    </div>
+    <div class="who" id="who" hidden>
+      <div>Вы: <b id="nick-label"></b>, ваших отметок: <b id="mine">0</b></div>
+      <div><span id="online"></span> <button class="linkbtn" id="change">сменить ник или код</button></div>
+    </div>
+  </header>
+
+  <section class="setup" id="setup" hidden>
+    <h2>Добро пожаловать в ревью</h2>
+    <p>Вы слушаете реплики озвучки по одной и отмечаете: всё верно или есть ошибка. Каждую реплику проверяет один человек,
+       поэтому сайт сам выдаёт следующую, которую ещё никто не взял. Код приглашения — в Discord Wayfarer.</p>
+    <form id="setup-form">
+      <label for="nick">Ваш ник (как в Discord)<input id="nick" maxlength="40" autocomplete="nickname" required></label>
+      <label for="code">Код приглашения<input id="code" maxlength="60" autocomplete="off" required></label>
+      <div class="error" id="setup-error" role="alert"></div>
+      <button class="btn ok" type="submit">Начать</button>
+    </form>
+  </section>
+
+  <main id="app" hidden>
+    <article class="card" id="card" aria-live="polite">
+      <div id="line-view" hidden>
+        <div class="chips" id="chips"></div>
+        <div class="title" id="title"></div>
+        <div class="speaker" id="speaker"></div>
+        <div class="player">
+          <button class="play" id="play" aria-label="Слушать (пробел)"></button>
+          <div class="track">
+            <div class="seek" id="seek" role="slider" aria-label="Позиция" tabindex="0"><div class="done" id="seek-done"></div></div>
+            <div class="times"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+          </div>
+          <button class="again" id="again" title="Сначала (A)">↺ сначала</button>
+          <button class="speed" id="speed" title="Скорость">1×</button>
+        </div>
+        <p class="text" id="text"></p>
+        <div class="uid"><span id="uid"></span><button id="copy-uid">скопировать</button></div>
+        <div class="actions">
+          <button class="btn ok" id="btn-ok">Всё верно <kbd>Enter</kbd></button>
+          <button class="btn bad" id="btn-bad">Есть ошибка <kbd>R</kbd></button>
+          <button class="btn skip" id="btn-skip">Пропустить <kbd>S</kbd></button>
+        </div>
+        <div class="issue" id="issue" hidden>
+          <div class="cats" id="cats" role="group" aria-label="Что не так"></div>
+          <label class="muted" for="comment">Что именно (слово, время, как должно звучать)</label>
+          <textarea id="comment" maxlength="2000" placeholder="Например: «Тана́рис», а звучит «Танари́с» на 0:12"></textarea>
+          <div class="row">
+            <button class="btn bad" id="send">Отправить <kbd>Ctrl+Enter</kbd></button>
+            <button class="btn skip" id="cancel">Отмена <kbd>Esc</kbd></button>
+          </div>
+        </div>
+      </div>
+      <div id="empty" hidden>
+        <div class="title" id="empty-title">Загрузка…</div>
+        <p class="muted" id="empty-text"></p>
+        <button class="btn" id="retry" hidden>Проверить ещё раз</button>
+      </div>
+      <audio id="audio" preload="auto"></audio>
+    </article>
+
+    <aside>
+      <div class="box filters">
+        <h2>Что слушать</h2>
+        <label for="f-faction">Фракция</label>
+        <select id="f-faction">
+          <option value="">Все реплики</option>
+          <option value="alliance">Альянс и общие</option>
+          <option value="horde">Орда и общие</option>
+        </select>
+        <label for="f-kind">Тип</label>
+        <select id="f-kind">
+          <option value="">Все</option>
+          <option value="q">Квесты: взятие и сдача</option>
+          <option value="z">Рассказчик: лор мест</option>
+          <option value="g">Диалоги и реплики NPC</option>
+        </select>
+      </div>
+      <div class="box">
+        <h2>Мои последние</h2>
+        <ul class="list" id="recent"><li class="muted">Пока пусто.</li></ul>
+      </div>
+      <div class="box">
+        <h2>Лучшие тестировщики</h2>
+        <ol class="list" id="top"><li class="muted">—</li></ol>
+      </div>
+      <details class="box help">
+        <summary>Как проверять</summary>
+        <ul>
+          <li><b>Ударение</b> — слово с неверным ударением или ложной «ё».</li>
+          <li><b>Не тот голос</b> — голос не подходит NPC: раса, пол, возраст, характер.</li>
+          <li><b>Обрезано или склейка</b> — оборвано, проглочено, щелчок, повтор, шум.</li>
+          <li><b>Подача и эмоции</b> — шёпот или крик не к месту, странная интонация.</li>
+          <li><b>Текст или опечатка</b> — звучит не то, что написано, или ошибка в тексте.</li>
+          <li>Клавиши: пробел — слушать, A — сначала, Enter — всё верно, R — ошибка, 1–6 — что не так, S — пропустить.</li>
+        </ul>
+      </details>
+    </aside>
+  </main>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const cfg = window.REVIEW_CONFIG || null;
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("wf-review-" + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("wf-review-" + k, JSON.stringify(v)); } catch { /* приватное окно */ } },
+  };
+  const KINDS = { a: "Взятие квеста", c: "Сдача квеста", p: "Прогресс квеста", z: "Рассказчик", g: "Реплика NPC" };
+  const RACES = { human: "человек", dwarf: "дворф", nightelf: "ночной эльф", gnome: "гном", orc: "орк", troll: "тролль",
+    tauren: "таурен", scourge: "Отрекшийся", goblin: "гоблин", bloodelf: "высший эльф", skybourneelf: "небесный эльф",
+    narrator: "рассказчик", elemental: "элементаль", satyr: "сатир", myzrael: "Мизраэль", child: "ребёнок" };
+  const GENDERS = { male: "мужской голос", female: "женский голос" };
+  const FACTIONS = { alliance: "Альянс", horde: "Орда" };
+
+  let LINES = [], BY_UID = {}, CATS = [];
+  let done = new Set(), skipped = new Set(store.get("skipped", []));
+  let me = { nick: store.get("nick", ""), code: store.get("code", "") };
+  let current = null, busy = false, category = null;
+  const audio = $("audio");
+  const speeds = [1, 1.25, 1.5];
+  let speedIx = 0;
+
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toast.timer); toast.timer = setTimeout(() => (t.hidden = true), 3500);
+  }
+  const fmt = s => isFinite(s) ? Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0") : "0:00";
+  const num = n => Number(n || 0).toLocaleString("ru-RU");
+
+  async function rpc(fn, params) {
+    // Новый открытый ключ Supabase (sb_publishable_…) идёт только в apikey; старый anon-ключ (JWT) — ещё и в Authorization.
+    const headers = { apikey: cfg.anon, "Content-Type": "application/json" };
+    if (cfg.anon.startsWith("eyJ")) headers.Authorization = "Bearer " + cfg.anon;
+    const res = await fetch(cfg.url + "/rest/v1/rpc/" + fn, { method: "POST", headers, body: JSON.stringify(params) });
+    const body = await res.text();
+    const data = body ? JSON.parse(body) : null;
+    if (!res.ok) throw new Error((data && (data.message || data.hint)) || ("ошибка " + res.status));
+    return data;
+  }
+  const auth = () => ({ p_code: me.code, p_tester: me.nick });
+
+  // --- очередь ---------------------------------------------------------------------------------------------
+  function wanted(it) {
+    const f = $("f-faction").value, k = $("f-kind").value;
+    if (f && it.f !== f && it.f !== "both") return false;
+    if (k === "q" && !"acp".includes(it.k)) return false;
+    if (k && k !== "q" && it.k !== k) return false;
+    return true;
+  }
+
+  async function refreshDone() {
+    done = new Set(await rpc("reviewed_uids", { p_code: me.code }));
+  }
+
+  async function next() {
+    if (busy) return;
+    busy = true; setButtons(false);
+    try {
+      let start = 0;
+      for (let attempt = 0; attempt < 40; attempt++) {
+        const cands = [];
+        for (; start < LINES.length && cands.length < 60; start++) {
+          const it = LINES[start];
+          if (!done.has(it.u) && !skipped.has(it.u) && wanted(it)) cands.push(it.u);
+        }
+        if (!cands.length) break;
+        const uid = await rpc("next_line", { ...auth(), p_candidates: cands });
+        if (uid) { show(BY_UID[uid]); return; }
+      }
+      showEmpty();
+    } catch (e) {
+      showEmpty("Не получилось взять реплику", e.message);
+    } finally {
+      busy = false; setButtons(true);
+    }
+  }
+
+  function setButtons(on) { for (const id of ["btn-ok", "btn-bad", "btn-skip", "send"]) $(id).disabled = !on; }
+
+  function show(it) {
+    current = it; category = null;
+    $("empty").hidden = true; $("line-view").hidden = false; $("issue").hidden = true; $("comment").value = "";
+    renderCats();
+    const chips = $("chips"); chips.textContent = "";
+    const chip = (text, cls) => { const s = document.createElement("span"); s.className = "chip " + (cls || ""); s.textContent = text; chips.append(s); };
+    chip(KINDS[it.k] || "Реплика", "kind");
+    if (it.l) chip("ур. " + it.l);
+    if (FACTIONS[it.f]) chip(FACTIONS[it.f], it.f);
+    if (it.z && it.k !== "z") chip(it.z);
+    $("title").textContent = it.k === "z" ? (it.s || it.ti || it.z || "Место") : (it.ti || it.s || "Реплика");
+    const parts = (it.v || "").split("-");
+    const voice = [RACES[parts[0]] || parts[0], GENDERS[parts[1]] || ""].filter(Boolean).join(", ");
+    const sp = $("speaker"); sp.textContent = "";
+    if (it.k !== "z" && it.s) { const b = document.createElement("b"); b.textContent = it.s; sp.append(b, " — "); }
+    sp.append(it.k === "z" ? "голос рассказчика" : (voice || "голос"));
+    $("text").textContent = it.t || "";
+    $("uid").textContent = it.u;
+    audio.src = it.a;
+    audio.playbackRate = speeds[speedIx];
+    audio.play().catch(() => {});
+    $("btn-ok").focus({ preventScroll: true });
+  }
+
+  function showEmpty(title, text) {
+    current = null; audio.pause();
+    $("line-view").hidden = true; $("empty").hidden = false;
+    const left = LINES.filter(it => !done.has(it.u) && wanted(it)).length;
+    $("empty-title").textContent = title || (left ? "Свободных реплик пока нет" : "Всё проверено!");
+    $("empty-text").textContent = text || (left
+      ? "Остальные реплики этого фильтра сейчас слушают другие тестировщики. Загляните через несколько минут или смените фильтр."
+      : "В этом фильтре не осталось непроверенных реплик. Спасибо!");
+    $("retry").hidden = false;
+  }
+
+  // --- отметки -----------------------------------------------------------------------------------------
+  async function submit(status) {
+    if (!current || busy) return;
+    if (status === "issue" && !category) { toast("Выберите, что не так (1–6)"); return; }
+    const it = current;
+    busy = true; setButtons(false);
+    try {
+      const fresh = await rpc("submit_review", { ...auth(), p_uid: it.u, p_status: status,
+        p_category: status === "issue" ? category : null, p_comment: status === "issue" ? $("comment").value.trim() : null });
+      done.add(it.u);
+      if (!fresh) toast("Эту реплику уже успел отметить кто-то другой");
+      remember(it, status);
+      busy = false;
+      refreshStats();
+      await next();
+    } catch (e) {
+      toast("Не сохранилось: " + e.message);
+    } finally {
+      busy = false; setButtons(true);
+    }
+  }
+
+  async function skip() {
+    if (!current || busy) return;
+    const it = current;
+    skipped.add(it.u); store.set("skipped", [...skipped].slice(-500));
+    try { await rpc("release_line", { ...auth(), p_uid: it.u }); } catch { /* освободится сама через 20 минут */ }
+    await next();
+  }
+
+  function remember(it, status) {
+    const recent = store.get("recent", []);
+    recent.unshift({ u: it.u, s: status, title: it.ti || it.s || it.z || it.u, at: Date.now() });
+    store.set("recent", recent.slice(0, 12));
+    renderRecent();
+  }
+
+  function renderRecent() {
+    const ul = $("recent"); ul.textContent = "";
+    const recent = store.get("recent", []);
+    if (!recent.length) { const li = document.createElement("li"); li.className = "muted"; li.textContent = "Пока пусто."; ul.append(li); return; }
+    recent.forEach((r, i) => {
+      const li = document.createElement("li");
+      const left = document.createElement("span"); left.textContent = r.title;
+      const right = document.createElement("span");
+      const mark = document.createElement("span"); mark.className = "mark " + r.s; mark.textContent = r.s === "ok" ? "верно" : "ошибка";
+      right.append(mark);
+      if (i === 0 && Date.now() - r.at < 864e5) {
+        const undo = document.createElement("button"); undo.className = "linkbtn"; undo.textContent = "отменить";
+        undo.style.marginLeft = "8px";
+        undo.onclick = async () => {
+          try {
+            if (await rpc("undo_review", { ...auth(), p_uid: r.u })) {
+              done.delete(r.u); recent.shift(); store.set("recent", recent); renderRecent(); refreshStats();
+              toast("Отметка снята — реплика снова в очереди");
+            } else toast("Отменить не получилось: отметка не ваша или старше суток");
+          } catch (e) { toast(e.message); }
+        };
+        right.append(undo);
+      }
+      li.append(left, right); ul.append(li);
+    });
+  }
+
+  function renderCats() {
+    const box = $("cats"); box.textContent = "";
+    CATS.forEach((c, i) => {
+      const b = document.createElement("button");
+      b.className = "cat"; b.type = "button"; b.setAttribute("aria-pressed", String(category === c));
+      const k = document.createElement("kbd"); k.textContent = i + 1;
+      b.append(k, c);
+      b.onclick = () => { category = c; renderCats(); $("comment").focus(); };
+      box.append(b);
+    });
+  }
+
+  function openIssue() {
+    if (!current) return;
+    $("issue").hidden = false; renderCats();
+    $("cats").querySelector("button")?.focus();
+  }
+
+  // --- сводка ------------------------------------------------------------------------------------------
+  async function refreshStats() {
+    try {
+      const s = await rpc("stats", auth());
+      const total = LINES.length;
+      $("fill").style.width = (total ? Math.min(100, 100 * s.reviewed / total) : 0) + "%";
+      $("done-n").textContent = "Проверено: " + num(s.reviewed) + " из " + num(total);
+      $("left-n").textContent = "замечаний: " + num(s.issues);
+      $("mine").textContent = num(s.mine);
+      $("online").textContent = s.active ? "сейчас слушают: " + s.active : "";
+      const ol = $("top"); ol.textContent = "";
+      (s.top || []).forEach(t => {
+        const li = document.createElement("li");
+        const name = document.createElement("span"); name.textContent = t.tester; if (t.tester === me.nick) name.className = "me";
+        const n = document.createElement("span"); n.className = "n"; n.textContent = num(t.n);
+        li.append(name, n); ol.append(li);
+      });
+      if (!ol.children.length) { const li = document.createElement("li"); li.className = "muted"; li.textContent = "Пока никого."; ol.append(li); }
+    } catch { /* сводка подождёт */ }
+  }
+
+  // --- плеер -------------------------------------------------------------------------------------------
+  const ICON_PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 2.5h3v11h-3zM9.5 2.5h3v11h-3z" fill="currentColor"/></svg>';
+  const syncPlay = () => { $("play").innerHTML = audio.paused ? ICON_PLAY : ICON_PAUSE; };
+  audio.addEventListener("play", syncPlay); audio.addEventListener("pause", syncPlay); audio.addEventListener("ended", syncPlay);
+  audio.addEventListener("timeupdate", () => {
+    $("cur").textContent = fmt(audio.currentTime);
+    $("seek-done").style.width = (audio.duration ? 100 * audio.currentTime / audio.duration : 0) + "%";
+  });
+  // У Opus длительность иногда приходит не сразу — обновляем при каждом её изменении.
+  for (const ev of ["loadedmetadata", "durationchange"]) {
+    audio.addEventListener(ev, () => { $("dur").textContent = fmt(audio.duration); });
+  }
+  audio.addEventListener("error", () => { if (current) toast("Звук не загрузился — нажмите «Пропустить»"); });
+  const toggle = () => (audio.paused ? audio.play().catch(() => {}) : audio.pause());
+  $("play").onclick = toggle;
+  $("again").onclick = () => { audio.currentTime = 0; audio.play().catch(() => {}); };
+  $("speed").onclick = () => { speedIx = (speedIx + 1) % speeds.length; audio.playbackRate = speeds[speedIx]; $("speed").textContent = speeds[speedIx] + "×"; };
+  $("seek").onclick = e => {
+    const r = e.currentTarget.getBoundingClientRect();
+    if (audio.duration) audio.currentTime = audio.duration * Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+  };
+  syncPlay();
+
+  // --- кнопки и клавиши ------------------------------------------------------------------------------------
+  $("btn-ok").onclick = () => submit("ok");
+  $("btn-bad").onclick = openIssue;
+  $("btn-skip").onclick = skip;
+  $("send").onclick = () => submit("issue");
+  $("cancel").onclick = () => { $("issue").hidden = true; category = null; $("btn-bad").focus(); };
+  $("retry").onclick = async () => { try { await refreshDone(); } catch { } next(); };
+  $("copy-uid").onclick = () => navigator.clipboard?.writeText(current?.u || "").then(() => toast("Скопировано"), () => {});
+  for (const id of ["f-faction", "f-kind"]) {
+    $(id).onchange = async () => {
+      store.set(id, $(id).value);
+      if (current) { try { await rpc("release_line", { ...auth(), p_uid: current.u }); } catch { } }
+      next();
+    };
+  }
+  document.addEventListener("keydown", e => {
+    if ($("app").hidden) return;
+    const typing = e.target instanceof Element && e.target.matches("textarea, input, select");
+    const issueOpen = !$("issue").hidden;
+    if (e.key === "Escape" && issueOpen) { e.preventDefault(); $("cancel").click(); return; }
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && issueOpen) { e.preventDefault(); submit("issue"); return; }
+    if (typing) return;
+    if (issueOpen && /^[1-6]$/.test(e.key)) { e.preventDefault(); category = CATS[+e.key - 1]; renderCats(); $("comment").focus(); return; }
+    const k = e.key.toLowerCase();
+    if (e.key === " ") { e.preventDefault(); toggle(); }
+    else if (e.key === "Enter" && !issueOpen && e.target.tagName !== "BUTTON") { e.preventDefault(); submit("ok"); }
+    else if (k === "r" || k === "к") { e.preventDefault(); openIssue(); }
+    else if (k === "s" || k === "ы") { e.preventDefault(); skip(); }
+    else if (k === "a" || k === "ф") { e.preventDefault(); $("again").click(); }
+  });
+
+  // --- вход ------------------------------------------------------------------------------------------------
+  function showSetup(err) {
+    $("app").hidden = true; $("who").hidden = true; $("setup").hidden = false;
+    $("nick").value = me.nick; $("code").value = me.code;
+    $("setup-error").textContent = err || "";
+    $(me.nick ? "code" : "nick").focus();
+  }
+  $("change").onclick = () => showSetup();
+  $("setup-form").onsubmit = async e => {
+    e.preventDefault();
+    me = { nick: $("nick").value.trim(), code: $("code").value.trim() };
+    try {
+      await rpc("stats", auth());
+      store.set("nick", me.nick); store.set("code", me.code);
+      start();
+    } catch (err) {
+      $("setup-error").textContent = /код/i.test(err.message) ? "Неверный код приглашения — возьмите его в Discord Wayfarer." : err.message;
+    }
+  };
+
+  async function start() {
+    $("setup").hidden = true; $("app").hidden = false; $("who").hidden = false;
+    $("nick-label").textContent = me.nick;
+    $("f-faction").value = store.get("f-faction", ""); $("f-kind").value = store.get("f-kind", "");
+    renderRecent();
+    try { await refreshDone(); } catch (e) { showEmpty("Нет связи с базой", e.message); return; }
+    refreshStats();
+    next();
+  }
+
+  async function boot() {
+    if (!cfg || !cfg.url) {
+      $("setup").hidden = false; $("setup-form").hidden = true;
+      $("setup-error").textContent = "Сайт ещё не подключён к базе.";
+      return;
+    }
+    const data = await fetch("lines.json").then(r => r.json());
+    LINES = data.lines; CATS = data.categories;
+    for (const it of LINES) BY_UID[it.u] = it;
+    $("done-n").textContent = "Реплик: " + num(LINES.length);
+    if (me.nick && me.code) {
+      try { await rpc("stats", auth()); start(); } catch { showSetup("Код больше не подходит — возьмите новый в Discord."); }
+    } else showSetup();
+    setInterval(refreshStats, 60000);
+    setInterval(() => { refreshDone().catch(() => {}); }, 120000);
+  }
+  boot().catch(e => { $("setup").hidden = false; $("setup-error").textContent = "Не загрузился список реплик: " + e.message; });
+})();
+</script>
+</body>
+</html>
