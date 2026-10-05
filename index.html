@@ -146,7 +146,7 @@
     </div>
     <div class="progress" aria-label="Общий прогресс">
       <div class="bar"><div class="fill" id="fill"></div></div>
-      <div class="nums"><span id="done-n">Проверено: —</span><span id="left-n"></span></div>
+      <div class="nums"><span id="done-n">Загружаю список реплик…</span><span id="left-n"></span></div>
     </div>
     <div class="who" id="who" hidden>
       <div>Вы: <b id="nick-label"></b>, ваших отметок: <b id="mine">0</b></div>
@@ -558,7 +558,12 @@
       $("setup-error").textContent = "Сайт ещё не подключён к базе.";
       return;
     }
-    const data = await fetch("lines.json").then(r => r.json());
+    // Список реплик — 6 МБ (1,5 МБ сжатым): пока грузится, в шапке «Загружаю…»; если связь медленная — подсказка.
+    const slow = setTimeout(() => { $("done-n").textContent = "Загружаю список реплик… (медленная связь, подождите)"; }, 8000);
+    const resp = await fetch("lines.json");
+    if (!resp.ok) throw new Error("сервер ответил " + resp.status);
+    const data = await resp.json();
+    clearTimeout(slow);
     LINES = data.lines; CATS = data.categories;
     for (const it of LINES) BY_UID[it.u] = it;
     $("done-n").textContent = "Реплик: " + num(LINES.length);
@@ -568,7 +573,11 @@
     setInterval(refreshStats, 60000);
     setInterval(() => { refreshDone().catch(() => {}); }, 120000);
   }
-  boot().catch(e => { $("setup").hidden = false; $("setup-error").textContent = "Не загрузился список реплик: " + e.message; });
+  boot().catch(e => {
+    $("done-n").textContent = "Список реплик не загрузился";
+    $("setup").hidden = false;
+    $("setup-error").textContent = "Не загрузился список реплик: " + e.message + ". Обновите страницу (Ctrl+F5); если не поможет — напишите в Discord.";
+  });
 })();
 </script>
 </body>
